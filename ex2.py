@@ -1,24 +1,41 @@
-from ftplib import FTP
+import matplotlib.pyplot as plt
+import pandas as pd
 
+# Создаем DataFrame с данными для диаграммы Ганта
+tasks = {
+    'Task': [
+        'Мыть посуду', 'Пропылесосить паласы', 'Мыть столы', 'Снять шторы', 'Повесить шторы', 'Мыть окна',
+        'Снять паутину с потолков', 'Закупка', 'Вызов сантехника', 'Уничтожение насекомых', 'Вызов крысолова'
+    ],
+    'Start': [
+        9, 11, 13, 9, 12, 9, 12, 10, 9, 11, 10
+    ],
+    'Finish': [
+        11, 13, 17, 10, 14, 17, 15, 10.5, 9.25, 11.33, 10.25
+    ],
+    'Resource': [
+        'Член 1', 'Член 1', 'Член 1', 'Член 2', 'Член 2', 'Мойщики', 'Член 3', 'Член 3', 'Сантехник', 'Специалист', 'Крысолов'
+    ]
+}
 
-def copy_files_between_ftp(source_ftp, source_path, dest_ftp, dest_path, file_extension=None):
-    with FTP(source_ftp) as source_connection, FTP(dest_ftp) as dest_connection:
-        source_connection.login()
-        dest_connection.login()
+df = pd.DataFrame(tasks)
 
-        source_connection.cwd(source_path)
+# Настраиваем график
+fig, ax = plt.subplots(figsize=(12, 8))
 
-        file_list = source_connection.nlst()
+# Создаем полосы для диаграммы
+for idx, row in df.iterrows():
+    ax.barh(row['Resource'], row['Finish'] - row['Start'], left=row['Start'])
 
-        if file_extension:
-            file_list = [file for file in file_list if file.endswith(file_extension)]
+# Настройка осей и меток
+ax.set_xlabel('Время (часы)')
+ax.set_ylabel('Ресурс')
+ax.set_title('Диаграмма Ганта для уборки офиса с учетом бюджета')
 
-        for file in file_list:
-            source_file_path = f"{source_path}/{file}"
-            dest_file_path = f"{dest_path}/{file}"
+# Настройка меток по оси X
+ax.set_xticks(range(9, 18))
+ax.set_xticklabels([str(i) + ':00' for i in range(9, 18)])
 
-            with source_connection.retrbinary(f"RETR {source_file_path}",
-                                              dest_connection.storbinary(f"STOR {dest_file_path}",
-                                                                         open(file, 'wb').write)):
-                pass
-
+# Показ диаграммы
+plt.tight_layout()
+plt.show()
