@@ -23,6 +23,9 @@ df = pd.DataFrame(tasks)
 
 
 
+
+
+
 # Настраиваем график
 fig, ax = plt.subplots(figsize=(12, 8))
 
